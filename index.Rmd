@@ -37,10 +37,10 @@ Datos_Policiales <-
   read_xls(path = "C:/Users/Josue Alcazar/Desktop/R Tareas/estadisticaspoliciales2021.xls")
 
 ```
-##### 1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.
-##### - Los encabezados de las columnas en la tabla deben estar correctamente escritos (ej. con tildes), pero no deben alterarse los nombres de las columnas del conjunto de datos. Sugerencia: utilice el argumento colnames de la función DT::datatable().
-##### - Los controles de la tabla deben estar en español.
-```{r, echo=FALSE, results='hide',message=FALSE}
+##### **1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.**
+- Los encabezados de las columnas en la tabla deben estar correctamente escritos (ej. con tildes), pero no deben alterarse los nombres de las columnas del conjunto de datos. Sugerencia: utilice el argumento colnames de la función DT::datatable().
+- Los controles de la tabla deben estar en español.
+```{r, echo=FALSE, message=FALSE}
 Datos_Policiales %>%
   select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%
   mutate(Fecha = as.Date(Fecha, format = "%d/%m/%Y"))%>% 
@@ -51,12 +51,14 @@ Datos_Policiales %>%
     language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
   ))
 ```
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
-##### 2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).
-##### -Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más corta (ya sea de izquierda a derecha o de arriba a abajo).
-##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
-##### -Todo el contenido del gráfico debe ser legible.
-##### -Los controles del gráfico deben estar en español.
+
+##### **2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).**
+- Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más corta (ya sea de izquierda a derecha o de arriba a abajo).
+- El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+- Todo el contenido del gráfico debe ser legible.
+- Los controles del gráfico deben estar en español.
 ```{r graficos, echo=FALSE, results='hide',message=FALSE}
 delitos_x_tipodelito <-
   Datos_Policiales %>%
@@ -77,15 +79,18 @@ Grafico_barras_delixprov <-
 
 ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 ```
-##### 3. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
-##### - Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más  corta (ya sea de izquierda a derecha o de arriba a abajo).
 
-##### - El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+##### **3. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).**
 
-##### - Todo el contenido del gráfico debe ser legible.
+- Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más  corta (ya sea de izquierda a derecha o de arriba a abajo).
 
-##### - Los controles del gráfico deben estar en español.
+- El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+
+- Todo el contenido del gráfico debe ser legible.
+
+- Los controles del gráfico deben estar en español.
 
 ```{r, echo=FALSE, results='hide',message=FALSE}
 delitos_x_victima <-
@@ -105,56 +110,52 @@ Grafico_barras_delixvictim <-
 
 ggplotly(Grafico_barras_delixvictim) %>% config(locale = 'es')
 ```
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
-##### 4. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por mes del año (una barra por cada uno de los meses del año).
-##### -Las barras del gráfico deben estar ordenadas por número de mes (1, 2, …) o nombre de mes (Enero, Febrero, …), pero de acuerdo con el orden de los meses en el calendario.
-##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
-##### -Todo el contenido del gráfico debe ser legible.
-##### -Los controles de la tabla deben estar en español.
+
+
+##### **4. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por mes del año (una barra por cada uno de los meses del año).**
+- Las barras del gráfico deben estar ordenadas por número de mes (1, 2, …) o nombre de mes (Enero, Febrero, …), pero de acuerdo con el orden de los meses en el calendario.
+ - El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+- Todo el contenido del gráfico debe ser legible.
+ - Los controles de la tabla deben estar en español.
 ```{r,echo=FALSE, results='hide',message=FALSE}
 delitos_x_fecha <-
   Datos_Policiales %>%
   count( Fecha , name = "Cantidad de delitos por fecha")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
 
 ```
-##### 5. Un gráfico de barras apiladas, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre una barra por cada tipo de delito (asalto, homicidio, hurto, etc). Cada barra debe mostrar la proporción (no la cantidad) de delitos por género (mujer, hombre, desconocido).
-##### - El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
-##### - Todo el contenido del gráfico debe ser legible.
-```{r}
-Datosxgenero <-
-Datos_Policiales %>%
-  group_by(Delito) %>%
- count(Genero)
-```
-```{r}
-Datosxgenero %>% 
-group_by(Delito) %>% 
- summarise( n1=n(), porcentaje = round(n1/n*100, digits = 1))
-```
+##### **5. Un gráfico de barras apiladas, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre una barra por cada tipo de delito (asalto, homicidio, hurto, etc). Cada barra debe mostrar la proporción (no la cantidad) de delitos por género (mujer, hombre, desconocido).**
+- El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+- Todo el contenido del gráfico debe ser legible.
 
-```{r, echo=FALSE, results='hide',message=FALSE}
+```{r, echo=FALSE, message=FALSE}
 
 
 ggplot2_barras_apiladas_cantidad <-
   Datos_Policiales %>%
   ggplot(aes(x = Delito , fill = Genero)) +
   geom_bar() +
-  ggtitle("Cantidad de diamantes por tipo de corte y claridad") +
-  xlab("Corte") +
-  ylab("Cantidad") +
+  ggtitle("Porcentage de delitos por genero") +
+  xlab("cantidad") +
+  ylab("Tipo de delito") +
   labs(fill = "Genero") +
+  coord_flip() + 
   theme_minimal()
 
 ggplotly(ggplot2_barras_apiladas_cantidad) %>% config(locale = 'es')
 ```
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
 
-##### 6.Un mapa de coropletas desarrollado con leaflet que muestre la cantidad de delitos en los cantones de Costa Rica (vea el ejemplo desarrollado en clase). El mapa debe tener:
-##### -Una capa base (ej. OpenStreetMap).
-##### -Una capa de polígonos de cantones cuyos colores reflejen la cantidad de delitos en cada cantón, de acuerdo con un esquema de colores adecuado.
-##### -Un control para activar y desactivar las capas.
-##### -Una leyenda que muestre los rangos de valores asociados a los colores.
-```{r}
+
+
+##### **6.Un mapa de coropletas desarrollado con leaflet que muestre la cantidad de delitos en los cantones de Costa Rica (vea el ejemplo desarrollado en clase). El mapa debe tener:**
+- Una capa base (ej. OpenStreetMap).
+- Una capa de polígonos de cantones cuyos colores reflejen la cantidad de delitos en cada cantón, de acuerdo con un esquema de colores adecuado.
+- Un control para activar y desactivar las capas.
+- Una leyenda que muestre los rangos de valores asociados a los colores.
+```{r, echo=FALSE, results='hide',message=FALSE}
 # Normalización de los nombres de cantones
 
 # En el data frame de cantones
@@ -168,7 +169,7 @@ Datos_Policiales <-
   mutate(canton_normalizado = tolower(stri_trans_general(Canton, id = "Latin-ASCII")))
 ```
 
-```{r}
+```{r, echo=FALSE, results='hide',message=FALSE}
 Datos_Policiales %>%
   left_join(
     dplyr::select(st_drop_geometry(cantones),
@@ -180,13 +181,13 @@ Datos_Policiales %>%
   filter(is.na(cod_canton) & canton_normalizado != "desconocido") %>% # los cod_canton = NA son los que no están en el data frame de cantones
   distinct(canton_normalizado) # se despliegan solo los nombres de cantones diferentes
 ```
-```{r}
+```{r, echo=FALSE, results='hide',message=FALSE}
 Datos_Policiales <-
   Datos_Policiales %>%
   mutate(Canton = if_else(Canton == "LEON CORTES", "LEON CORTES CASTRO", Canton)) %>%
   mutate(Canton = if_else(Canton == "VASQUEZ DE CORONADO", "VAZQUEZ DE CORONADO", Canton))
 ```
-```{r}
+```{r, echo=FALSE, results='hide',message=FALSE}
 # Unión del código de cantón a delitos
 Datos_Policiales <-
   Datos_Policiales%>%
@@ -204,7 +205,7 @@ Datos_Policiales <-
 ```{r}
 
 ```
-```{r}
+```{r, echo=FALSE, results='hide',message=FALSE}
 # Conteo de registros por código de cantón
 delitos_x_canton <-
   Datos_Policiales %>%
@@ -230,24 +231,14 @@ cantones_delitos %>%
     language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
   ))
 ```
-```{r}
+```{r, echo=FALSE, results='hide',message=FALSE}
 colores_cantones_delitos <-
   colorNumeric(palette = "Reds",
                domain = cantones_delitos$delitos,
                na.color = "transparent")
 ```
-```{r}
-plot(
-  cantones_delitos["delitos"],
-  extent = st_bbox(c(xmin = -86.0, xmax = -82.3, ymin = 8.0, ymax = 11.3)),
-  col = colores_cantones_delitos(cantones_delitos$delitos),
-  main = "Cantidad de delitos ocurridos en 2021 en cantones de Costa Rica",
-  axes = TRUE,
-  graticule = TRUE
-)
-```
-
-```{r}
+##### **Mapa interactivo**
+```{r,echo=FALSE,message=FALSE}
 leaflet() %>%
   setView(# centro y nivel inicial de acercamiento
     lng = -84.19452,
@@ -292,5 +283,7 @@ leaflet() %>%
     title = "Cantidad de delitos"
   )
 ```
+
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
 
