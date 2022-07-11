@@ -23,6 +23,7 @@ library(spData)
 library(ggplot2)
 library(plotly)
 library(graphics)
+library(stringi)
 ```
 
 ```{r Carga de datos, echo=FALSE, results='hide',message=FALSE}
@@ -39,7 +40,7 @@ Datos_Policiales <-
 ##### 1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.
 ##### - Los encabezados de las columnas en la tabla deben estar correctamente escritos (ej. con tildes), pero no deben alterarse los nombres de las columnas del conjunto de datos. Sugerencia: utilice el argumento colnames de la función DT::datatable().
 ##### - Los controles de la tabla deben estar en español.
-```{r, echo=FALSE}
+```{r, echo=FALSE, results='hide',message=FALSE}
 Datos_Policiales %>%
   select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%
   mutate(Fecha = as.Date(Fecha, format = "%d/%m/%Y"))%>% 
@@ -66,7 +67,7 @@ delitos_x_tipodelito <-
 Grafico_barras_delixprov <-
  delitos_x_tipodelito %>%
   ggplot(aes(x = reorder(Delito, `Cantidad de delitos`), y = `Cantidad de delitos`)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", color = "lightblue", fill = "yellow") +
   ggtitle("Cantidad de delitos por tipo de delito") +
   xlab("Tipo de delito") +
   ylab("Cantidad de delitos") +
@@ -95,7 +96,7 @@ delitos_x_victima <-
 Grafico_barras_delixvictim <-
  delitos_x_victima %>%
   ggplot(aes(x = reorder(Victima,-`Cantidad de delitos por victima`), y = `Cantidad de delitos por victima`)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", color = "black",fill = "lightblue") +
   ggtitle("Cantidad de delitos por tipo de delito") +
   xlab("Tipo de delito") +
   ylab("Cantidad de delitos") +
@@ -119,8 +120,20 @@ delitos_x_fecha <-
 ##### 5. Un gráfico de barras apiladas, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre una barra por cada tipo de delito (asalto, homicidio, hurto, etc). Cada barra debe mostrar la proporción (no la cantidad) de delitos por género (mujer, hombre, desconocido).
 ##### - El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
 ##### - Todo el contenido del gráfico debe ser legible.
-
 ```{r}
+Datosxgenero <-
+Datos_Policiales %>%
+  group_by(Delito) %>%
+ count(Genero)
+```
+```{r}
+Datosxgenero %>% 
+group_by(Delito) %>% 
+ summarise( n1=n(), porcentaje = round(n1/n*100, digits = 1))
+```
+
+```{r, echo=FALSE, results='hide',message=FALSE}
+
 
 ggplot2_barras_apiladas_cantidad <-
   Datos_Policiales %>%
@@ -142,11 +155,97 @@ ggplotly(ggplot2_barras_apiladas_cantidad) %>% config(locale = 'es')
 ##### -Un control para activar y desactivar las capas.
 ##### -Una leyenda que muestre los rangos de valores asociados a los colores.
 ```{r}
-delitos_x_canton <-
+# Normalización de los nombres de cantones
+
+# En el data frame de cantones
+cantones <-
+  cantones %>%
+  mutate(canton_normalizado = tolower(stri_trans_general(canton, id = "Latin-ASCII")))
+
+# En el data frame de delitos
+Datos_Policiales <-
   Datos_Policiales %>%
-  count(Canton, name = "Cantidad de delitos por canton")
+  mutate(canton_normalizado = tolower(stri_trans_general(Canton, id = "Latin-ASCII")))
 ```
 
+```{r}
+Datos_Policiales %>%
+  left_join(
+    dplyr::select(st_drop_geometry(cantones),
+                  canton_normalizado, cod_canton),
+    by = "canton_normalizado",
+    copy = FALSE,
+    keep = FALSE
+  ) %>%
+  filter(is.na(cod_canton) & canton_normalizado != "desconocido") %>% # los cod_canton = NA son los que no están en el data frame de cantones
+  distinct(canton_normalizado) # se despliegan solo los nombres de cantones diferentes
+```
+```{r}
+Datos_Policiales <-
+  Datos_Policiales %>%
+  mutate(Canton = if_else(Canton == "LEON CORTES", "LEON CORTES CASTRO", Canton)) %>%
+  mutate(Canton = if_else(Canton == "VASQUEZ DE CORONADO", "VAZQUEZ DE CORONADO", Canton))
+```
+```{r}
+# Unión del código de cantón a delitos
+Datos_Policiales <-
+  Datos_Policiales%>%
+  left_join(
+    dplyr::select(
+      st_drop_geometry(cantones),
+      cod_canton,
+      canton_normalizado
+    ),
+    by = "canton_normalizado",
+    copy = FALSE,
+    keep = FALSE
+  )
+```
+```{r}
+
+```
+```{r}
+# Conteo de registros por código de cantón
+delitos_x_canton <-
+  Datos_Policiales %>%
+  count(cod_canton, name = "delitos")
+
+# Unión de cantidad de delitos por cantón a cantones
+cantones_delitos <-
+  cantones %>%
+  left_join(
+    delitos_x_canton,
+    by = "cod_canton",
+    copy = FALSE,
+    keep = FALSE
+  )
+
+# Visualización en formato de tabla
+cantones_delitos %>%
+  st_drop_geometry() %>%
+  select(canton, delitos) %>%
+  arrange(desc(delitos)) %>%
+  datatable(options = list(
+    pageLength = 10,
+    language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
+  ))
+```
+```{r}
+colores_cantones_delitos <-
+  colorNumeric(palette = "Reds",
+               domain = cantones_delitos$delitos,
+               na.color = "transparent")
+```
+```{r}
+plot(
+  cantones_delitos["delitos"],
+  extent = st_bbox(c(xmin = -86.0, xmax = -82.3, ymin = 8.0, ymax = 11.3)),
+  col = colores_cantones_delitos(cantones_delitos$delitos),
+  main = "Cantidad de delitos ocurridos en 2021 en cantones de Costa Rica",
+  axes = TRUE,
+  graticule = TRUE
+)
+```
 
 ```{r}
 leaflet() %>%
@@ -154,12 +253,44 @@ leaflet() %>%
     lng = -84.19452,
     lat = 9.572735,
     zoom = 7) %>%
-  addTiles(group = "OpenStreetMap") %>% # capa base
+    addTiles(group = "OpenStreetMap") %>% # capa base
+    addPolygons(#añade mapa
+    data = cantones_delitos,
+    fillColor = ~ colores_cantones_delitos(cantones_delitos$delitos),
+    fillOpacity = 0.6,
+    color = "black",
+    stroke = TRUE,
+    weight = 1.0,
+    popup = paste(
+      paste(
+        "<strong>Cantón:</strong>",
+        cantones_delitos$canton
+      ),
+      paste(
+        "<strong>Delitos:</strong>",
+        cantones_delitos$delitos
+      ),
+      sep = '<br/>'
+    ),
+    group = "Delitos en cantones"
+  )%>% 
+    addLayersControl(
+    # control de capas
+    baseGroups = c("OpenStreetMap"),
+    overlayGroups = c("Delitos en cantones")
+  ) %>% 
   addResetMapButton() %>%
-  addSearchOSM() %>%
   addMouseCoordinates() %>%
   addScaleBar(position = "bottomright", options = scaleBarOptions(imperial = FALSE)) %>%
-  addMiniMap(position = "bottomright")
+  addMiniMap(position = "bottomright") %>% 
+    addLegend(
+    # leyenda
+    position = "bottomleft",
+    pal = colores_cantones_delitos,
+    values = cantones_delitos$delitos,
+    group = "Delitos",
+    title = "Cantidad de delitos"
+  )
 ```
 
 
