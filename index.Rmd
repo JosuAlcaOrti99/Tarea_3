@@ -22,7 +22,7 @@ library(leafem)
 library(spData)
 library(ggplot2)
 library(plotly)
-library(RColorBrewer)
+library(graphics)
 ```
 
 ```{r Carga de datos, echo=FALSE, results='hide',message=FALSE}
@@ -42,14 +42,15 @@ Datos_Policiales <-
 ```{r, echo=FALSE}
 Datos_Policiales %>%
   select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%
+  mutate(Fecha = as.Date(Fecha, format = "%d/%m/%Y"))%>% 
     datatable(
     colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón" ),
     options = list(
     pageLength = 10,
     language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
   ))
-
 ```
+
 ##### 2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).
 ##### -Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más corta (ya sea de izquierda a derecha o de arriba a abajo).
 ##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
@@ -112,6 +113,53 @@ ggplotly(Grafico_barras_delixvictim) %>% config(locale = 'es')
 ```{r,echo=FALSE, results='hide',message=FALSE}
 delitos_x_fecha <-
   Datos_Policiales %>%
-  count(Fecha, name = "Cantidad de delitos por fecha")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
+  count( Fecha , name = "Cantidad de delitos por fecha")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
+
 ```
+##### 5. Un gráfico de barras apiladas, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre una barra por cada tipo de delito (asalto, homicidio, hurto, etc). Cada barra debe mostrar la proporción (no la cantidad) de delitos por género (mujer, hombre, desconocido).
+##### - El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+##### - Todo el contenido del gráfico debe ser legible.
+
+```{r}
+
+ggplot2_barras_apiladas_cantidad <-
+  Datos_Policiales %>%
+  ggplot(aes(x = Delito , fill = Genero)) +
+  geom_bar() +
+  ggtitle("Cantidad de diamantes por tipo de corte y claridad") +
+  xlab("Corte") +
+  ylab("Cantidad") +
+  labs(fill = "Genero") +
+  theme_minimal()
+
+ggplotly(ggplot2_barras_apiladas_cantidad) %>% config(locale = 'es')
+```
+
+
+##### 6.Un mapa de coropletas desarrollado con leaflet que muestre la cantidad de delitos en los cantones de Costa Rica (vea el ejemplo desarrollado en clase). El mapa debe tener:
+##### -Una capa base (ej. OpenStreetMap).
+##### -Una capa de polígonos de cantones cuyos colores reflejen la cantidad de delitos en cada cantón, de acuerdo con un esquema de colores adecuado.
+##### -Un control para activar y desactivar las capas.
+##### -Una leyenda que muestre los rangos de valores asociados a los colores.
+```{r}
+delitos_x_canton <-
+  Datos_Policiales %>%
+  count(Canton, name = "Cantidad de delitos por canton")
+```
+
+
+```{r}
+leaflet() %>%
+  setView(# centro y nivel inicial de acercamiento
+    lng = -84.19452,
+    lat = 9.572735,
+    zoom = 7) %>%
+  addTiles(group = "OpenStreetMap") %>% # capa base
+  addResetMapButton() %>%
+  addSearchOSM() %>%
+  addMouseCoordinates() %>%
+  addScaleBar(position = "bottomright", options = scaleBarOptions(imperial = FALSE)) %>%
+  addMiniMap(position = "bottomright")
+```
+
 
