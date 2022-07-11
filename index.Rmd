@@ -1,6 +1,6 @@
 ---
 title: "Tarea 3"
-author: "Patrick Alcázar"
+author: "Estudiante: Patrick Alcázar"
 date: '2022-07-10'
 output: html_document
 ---
@@ -11,13 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r Activar Paquetes, echo=FALSE, results='hide',message=FALSE}
 library(readr) # lectura de archivos CSV
-library(tidyr)
+library(tidyr) # tidyverse
 library(readxl) # lectura de archivos XLS
 library(dplyr) # transformación de datos
 library(DT) # tablas interactivas
 library(sf) # manejo de datos vectoriales
 library(leaflet) # mapas interactivos
-library(leaflet.extras)
+library(leaflet.extras) # extras de mapas interactivos
 library(leafem)
 library(spData)
 library(ggplot2)
@@ -31,10 +31,10 @@ cantones <-
   st_read(
     dsn = "C:/Users/Josue Alcazar/Desktop/R Tareas/cantones_simplificados.geojson",
     quiet = TRUE) %>%
-  st_transform(4326)
+  st_transform(4326) #carga datos de cantones
 
 Datos_Policiales <-
-  read_xls(path = "C:/Users/Josue Alcazar/Desktop/R Tareas/estadisticaspoliciales2021.xls")
+  read_xls(path = "C:/Users/Josue Alcazar/Desktop/R Tareas/estadisticaspoliciales2021.xls") # carga datos policiales
 
 ```
 ##### **1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.**
@@ -42,16 +42,16 @@ Datos_Policiales <-
 - Los controles de la tabla deben estar en español.
 ```{r, echo=FALSE, message=FALSE}
 Datos_Policiales %>%
-  select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%
-  mutate(Fecha = as.Date(Fecha, format = "%d/%m/%Y"))%>% 
+  select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%                     #carga las columnas que selecciono
+  mutate(Fecha = as.Date(Fecha, format = "%d/%m/%Y"))%>%                                  # cambia el formato de la columna a fecha 
     datatable(
-    colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón" ),
+    colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón" ), # le cambia el nombre a las columnas
     options = list(
-    pageLength = 10,
-    language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
-  ))
+    pageLength = 20,# dice cuantos datos se pueden visualizar
+    language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')      # cambia el lenguaje del datatable para que los controles esten en español
+  ))# genera el data table 
 ```
-##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)** 
 
 
 ##### **2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).**
@@ -62,27 +62,27 @@ Datos_Policiales %>%
 ```{r graficos, echo=FALSE, results='hide',message=FALSE}
 delitos_x_tipodelito <-
   Datos_Policiales %>%
-  count(Delito, name = "Cantidad de delitos")# con esto cuento la cantidad de delitos por tipo de delito y agrego la columna para el grafico 
+  count(Delito, name = "Cantidad de delitos") # con esto cuento la cantidad de delitos por tipo de delito y hago un dataframe para el grafico 
 
 ```
 ```{r, echo=FALSE}
 Grafico_barras_delixprov <-
  delitos_x_tipodelito %>%
-  ggplot(aes(x = reorder(Delito, `Cantidad de delitos`), y = `Cantidad de delitos`)) +
-  geom_bar(stat = "identity", color = "lightblue", fill = "yellow") +
-  ggtitle("Cantidad de delitos por tipo de delito") +
-  xlab("Tipo de delito") +
-  ylab("Cantidad de delitos") +
-  coord_flip() + 
-  theme_minimal()
+  ggplot(aes(x = reorder(Delito, `Cantidad de delitos`), y = `Cantidad de delitos`)) +    # Me ordena las columnas de mayor a menor y me da los parametros del grafico 
+  geom_bar(stat = "identity", color = "lightblue", fill = "yellow") +                     #define la identidad del grafico y personaliza las barras
+  ggtitle("Cantidad de delitos por tipo de delito") + # Me da el titulo del grafico 
+  xlab("Tipo de delito") + # Nombre del eje X
+  ylab("Cantidad de delitos") + # Nobre del eje y
+  coord_flip() + # Hace que el grafico quede horizontal
+  theme_minimal() # Me pone el tema del grafico 
 
 
 ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 ```
-##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**  
+  
 
-
-##### **3. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).**
+##### **3. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).**  
 
 - Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más  corta (ya sea de izquierda a derecha o de arriba a abajo).
 
@@ -95,7 +95,7 @@ ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 ```{r, echo=FALSE, results='hide',message=FALSE}
 delitos_x_victima <-
   Datos_Policiales %>%
-  count(Victima, name = "Cantidad de delitos por victima")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
+  count(Victima, name = "Cantidad de delitos por victima")                                # Con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
 ```
 ```{r, echo=FALSE}
 Grafico_barras_delixvictim <-
@@ -110,7 +110,7 @@ Grafico_barras_delixvictim <-
 
 ggplotly(Grafico_barras_delixvictim) %>% config(locale = 'es')
 ```
-##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**  
 
 
 
@@ -237,7 +237,7 @@ colores_cantones_delitos <-
                domain = cantones_delitos$delitos,
                na.color = "transparent")
 ```
-##### **Mapa interactivo**
+##### **Mapa interactivo con capa de coropletas referentes a la cantidad de delitos por cantón**
 ```{r,echo=FALSE,message=FALSE}
 leaflet() %>%
   setView(# centro y nivel inicial de acercamiento
