@@ -5,11 +5,11 @@ date: '2022-07-10'
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, echo=FALSE, results='hide',message=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r Activar Paquetes}
+```{r Activar Paquetes, echo=FALSE, results='hide',message=FALSE}
 library(readr) # lectura de archivos CSV
 library(tidyr)
 library(readxl) # lectura de archivos XLS
@@ -25,7 +25,7 @@ library(plotly)
 library(RColorBrewer)
 ```
 
-```{r Carga de datos}
+```{r Carga de datos, echo=FALSE, results='hide',message=FALSE}
 cantones <-
   st_read(
     dsn = "C:/Users/Josue Alcazar/Desktop/R Tareas/cantones_simplificados.geojson",
@@ -39,9 +39,9 @@ Datos_Policiales <-
 ##### 1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.
 ##### - Los encabezados de las columnas en la tabla deben estar correctamente escritos (ej. con tildes), pero no deben alterarse los nombres de las columnas del conjunto de datos. Sugerencia: utilice el argumento colnames de la función DT::datatable().
 ##### - Los controles de la tabla deben estar en español.
-```{r}
+```{r, echo=FALSE}
 Datos_Policiales %>%
-  select(Delito, Fecha, Victima, Provincia, Canton, Distrito)%>%
+  select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%
     datatable(
     colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón" ),
     options = list(
@@ -49,24 +49,19 @@ Datos_Policiales %>%
     language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
   ))
 
-Datos_Policiales %>% 
-  mutate(Fecha, as.Date(Fecha, format ='d%/m%/y%/'))
-  
-
-
 ```
 ##### 2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).
 ##### -Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más corta (ya sea de izquierda a derecha o de arriba a abajo).
 ##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
 ##### -Todo el contenido del gráfico debe ser legible.
 ##### -Los controles del gráfico deben estar en español.
-```{r graficos}
+```{r graficos, echo=FALSE, results='hide',message=FALSE}
 delitos_x_tipodelito <-
   Datos_Policiales %>%
   count(Delito, name = "Cantidad de delitos")# con esto cuento la cantidad de delitos por tipo de delito y agrego la columna para el grafico 
 
 ```
-```{r}
+```{r, echo=FALSE}
 Grafico_barras_delixprov <-
  delitos_x_tipodelito %>%
   ggplot(aes(x = reorder(Delito, `Cantidad de delitos`), y = `Cantidad de delitos`)) +
@@ -90,12 +85,12 @@ ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 
 ##### - Los controles del gráfico deben estar en español.
 
-```{r}
+```{r, echo=FALSE, results='hide',message=FALSE}
 delitos_x_victima <-
   Datos_Policiales %>%
   count(Victima, name = "Cantidad de delitos por victima")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
 ```
-```{r}
+```{r, echo=FALSE}
 Grafico_barras_delixvictim <-
  delitos_x_victima %>%
   ggplot(aes(x = reorder(Victima,-`Cantidad de delitos por victima`), y = `Cantidad de delitos por victima`)) +
@@ -114,7 +109,7 @@ ggplotly(Grafico_barras_delixvictim) %>% config(locale = 'es')
 ##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
 ##### -Todo el contenido del gráfico debe ser legible.
 ##### -Los controles de la tabla deben estar en español.
-```{r}
+```{r,echo=FALSE, results='hide',message=FALSE}
 delitos_x_fecha <-
   Datos_Policiales %>%
   count(Fecha, name = "Cantidad de delitos por fecha")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
