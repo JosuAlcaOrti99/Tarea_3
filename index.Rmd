@@ -36,12 +36,12 @@ Datos_Policiales <-
   read_xls(path = "C:/Users/Josue Alcazar/Desktop/R Tareas/estadisticaspoliciales2021.xls")
 
 ```
-##### (1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.
+##### 1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.
 ##### - Los encabezados de las columnas en la tabla deben estar correctamente escritos (ej. con tildes), pero no deben alterarse los nombres de las columnas del conjunto de datos. Sugerencia: utilice el argumento colnames de la función DT::datatable().
-##### - Los controles de la tabla deben estar en español.)
+##### - Los controles de la tabla deben estar en español.
 ```{r}
 Datos_Policiales %>%
-  select(Delito, Fecha, Victima, Provincia, Canton, Distrito) %>%
+  select(Delito, Fecha, Victima, Provincia, Canton, Distrito)%>%
     datatable(
     colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón" ),
     options = list(
@@ -49,8 +49,13 @@ Datos_Policiales %>%
     language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
   ))
 
+Datos_Policiales %>% 
+  mutate(Fecha, as.Date(Fecha, format ='d%/m%/y%/'))
+  
+
+
 ```
-##### Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).
+##### 2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).
 ##### -Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más corta (ya sea de izquierda a derecha o de arriba a abajo).
 ##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
 ##### -Todo el contenido del gráfico debe ser legible.
@@ -69,13 +74,13 @@ Grafico_barras_delixprov <-
   ggtitle("Cantidad de delitos por tipo de delito") +
   xlab("Tipo de delito") +
   ylab("Cantidad de delitos") +
-  coord_flip() +
+  coord_flip() + 
   theme_minimal()
 
 
 ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 ```
-##### Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).
+##### 3. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).
 
 ##### - Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más  corta (ya sea de izquierda a derecha o de arriba a abajo).
 
@@ -84,7 +89,34 @@ ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 ##### - Todo el contenido del gráfico debe ser legible.
 
 ##### - Los controles del gráfico deben estar en español.
-```{r}
 
+```{r}
+delitos_x_victima <-
+  Datos_Policiales %>%
+  count(Victima, name = "Cantidad de delitos por victima")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
+```
+```{r}
+Grafico_barras_delixvictim <-
+ delitos_x_victima %>%
+  ggplot(aes(x = reorder(Victima,-`Cantidad de delitos por victima`), y = `Cantidad de delitos por victima`)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Cantidad de delitos por tipo de delito") +
+  xlab("Tipo de delito") +
+  ylab("Cantidad de delitos") +
+  theme_minimal()
+
+
+ggplotly(Grafico_barras_delixvictim) %>% config(locale = 'es')
+```
+
+##### 4. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por mes del año (una barra por cada uno de los meses del año).
+##### -Las barras del gráfico deben estar ordenadas por número de mes (1, 2, …) o nombre de mes (Enero, Febrero, …), pero de acuerdo con el orden de los meses en el calendario.
+##### -El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
+##### -Todo el contenido del gráfico debe ser legible.
+##### -Los controles de la tabla deben estar en español.
+```{r}
+delitos_x_fecha <-
+  Datos_Policiales %>%
+  count(Fecha, name = "Cantidad de delitos por fecha")# con esto cuento la cantidad de delitos por victima y agrego la columna para el grafico 
 ```
 
