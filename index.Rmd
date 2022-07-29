@@ -1,8 +1,13 @@
 ---
 title: "Tarea 3"
-author: "Estudiante: Patrick Alcázar"
-date: '2022-07-10'
-output: html_document
+output:
+  flexdashboard::flex_dashboard:
+    orientation: column
+    vertical_layout: fill
+runtime:
+resource_files:
+- estadisticaspoliciales2021.xls
+- distritos_simplificados.geojson
 ---
 
 ```{r setup, echo=FALSE, results='hide',message=FALSE}
@@ -29,14 +34,16 @@ library(stringi)
 ```{r Carga de datos, echo=FALSE, results='hide',message=FALSE}
 cantones <-
   st_read(
-    dsn = "C:/Users/Josue Alcazar/Desktop/R Tareas/cantones_simplificados.geojson",
+    dsn = "cantones_simplificados.geojson",
     quiet = TRUE) %>%
   st_transform(4326) #carga datos de cantones
 
 Datos_Policiales <-
-  read_xls(path = "C:/Users/Josue Alcazar/Desktop/R Tareas/estadisticaspoliciales2021.xls") # carga datos policiales
+  read_xls(path = "estadisticaspoliciales2021.xls") # carga datos policiales
 
 ```
+# Parte 1
+
 ##### **1.Una tabla DT con las columnas Delito, Fecha, Víctima, Edad, Género, Provincia y Cantón.**
 - Los encabezados de las columnas en la tabla deben estar correctamente escritos (ej. con tildes), pero no deben alterarse los nombres de las columnas del conjunto de datos. Sugerencia: utilice el argumento colnames de la función DT::datatable().
 - Los controles de la tabla deben estar en español.
@@ -51,8 +58,9 @@ Datos_Policiales %>%
     language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
   )) 
 ```
-##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)** 
+##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
+# Parte 2
 
 ##### **2.Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por tipo de delito (una barra por tipo de delito: asalto, homicidio, hurto, etc).**
 - Las barras del gráfico deben estar ordenadas por longitud, de la más larga a la más corta (ya sea de izquierda a derecha o de arriba a abajo).
@@ -80,7 +88,7 @@ Grafico_barras_delixprov <-
 ggplotly(Grafico_barras_delixprov) %>% config(locale = 'es')
 ```
 ##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**  
-  
+# Parte3
 
 ##### **3. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por víctima (una barra por víctima: edificación, persona, vivienda, etc.).**  
 
@@ -112,7 +120,7 @@ ggplotly(Grafico_barras_delixvictim) %>% config(locale = 'es')
 ```
 ##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**  
 
-
+# Parte 4
 
 ##### **4. Un gráfico de barras simples, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre la cantidad de delitos por mes del año (una barra por cada uno de los meses del año).**
 - Las barras del gráfico deben estar ordenadas por número de mes (1, 2, …) o nombre de mes (Enero, Febrero, …), pero de acuerdo con el orden de los meses en el calendario.
@@ -154,7 +162,7 @@ Grafico_barras_delixficha <-
 ggplotly(Grafico_barras_delixficha) %>% config(locale = 'es')
 ```
 
-
+# Parte 5
 
 ##### **5. Un gráfico de barras apiladas, generado con ggplot2 y traducido a plotly con ggplotly(), que muestre una barra por cada tipo de delito (asalto, homicidio, hurto, etc). Cada barra debe mostrar la proporción (no la cantidad) de delitos por género (mujer, hombre, desconocido).**
 - El gráfico debe tener título, etiqueta para el eje X y etiqueta para el eje Y.
@@ -166,7 +174,7 @@ ggplotly(Grafico_barras_delixficha) %>% config(locale = 'es')
 ggplot2_barras_apiladas_cantidad <-
   Datos_Policiales %>%
   ggplot(aes(x = Delito , fill = Genero)) +
-  geom_bar() +
+  geom_bar(position = "fill") +
   ggtitle("Porcentage de delitos por genero") +
   xlab("cantidad") +
   ylab("Tipo de delito") +
@@ -180,12 +188,6 @@ ggplotly(ggplot2_barras_apiladas_cantidad) %>% config(locale = 'es')
 
 
 
-
-##### **6.Un mapa de coropletas desarrollado con leaflet que muestre la cantidad de delitos en los cantones de Costa Rica (vea el ejemplo desarrollado en clase). El mapa debe tener:**
-- Una capa base (ej. OpenStreetMap).
-- Una capa de polígonos de cantones cuyos colores reflejen la cantidad de delitos en cada cantón, de acuerdo con un esquema de colores adecuado.
-- Un control para activar y desactivar las capas.
-- Una leyenda que muestre los rangos de valores asociados a los colores.
 ```{r, echo=FALSE, results='hide',message=FALSE}
 # Normalización de los nombres de cantones
 
@@ -233,9 +235,7 @@ Datos_Policiales <-
     keep = FALSE
   )
 ```
-```{r}
 
-```
 ```{r, echo=FALSE, results='hide',message=FALSE}
 # Conteo de registros por código de cantón
 delitos_x_canton <-
@@ -268,7 +268,14 @@ colores_cantones_delitos <-
                domain = cantones_delitos$delitos,
                na.color = "transparent")
 ```
-##### **Mapa interactivo con capa de coropletas referentes a la cantidad de delitos por cantón**
+
+
+
+
+
+# Parte 6
+
+**Mapa interactivo con capa de coropletas referentes a la cantidad de delitos por cantón**
 ```{r,echo=FALSE,message=FALSE}
 leaflet() %>%
   setView(# centro y nivel inicial de acercamiento
@@ -315,6 +322,6 @@ leaflet() %>%
   )
 ```
 
-##### **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
+ **Fuente de los datos: [Página web de datos abiertos del Organismo de Investigación Judicial (OIJ).](https://sitiooij.poder-judicial.go.cr/index.php/ayuda/servicios-policiales/servicios-a-organizaciones/indice-de-transparencia-del-sector-publico-costarricense/datos-abiertos)**
 
 
